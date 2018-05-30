@@ -2,6 +2,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <iostream>
+#include <math.h>
 
 Transformation::Transformation()
 {
@@ -32,6 +33,7 @@ void Transformation::set_quat_trans(const Eigen::Quaterniond quat, const Eigen::
 
 void Transformation::set_from_velocities(const Eigen::Vector3d omega, const Eigen::Vector3d v, double dt) {
 	//maybe ask for help on this one
+	//However, I dont see anywhere where this is actually used
 }
 
 void Transformation::apply_transformation(Transformation *toApply) {
@@ -58,18 +60,51 @@ void Transformation::invert_and_compose(Transformation *curr, Transformation *pr
 	apply_transformation_to(this, curr);
 }
 
-Eigen::Vector3d Transformation::vector_interpolate_3d(const Eigen::Vector3d A, const Eigen::Vector3d B, double bw) {
+static Eigen::Vector3d Transformation::vector_interpolate_3d(const Eigen::Vector3d A, const Eigen::Vector3d B, double bw) {
 	double aw = 1-bw;
 	return Eigen::Vector3d(A(0)*aw + B(0)*bw, A(1)*aw + B(1)*bw, A(2)*aw + B(2)*bw);
 }
 
 
-Eigen::Quaterniond Transformation::quat_interpolate(const Eigen::Quaterniond q0, const Eigen::Quaterniond q1, double u) {
-	//in rotations.c
+static Eigen::Quaterniond Transformation::quat_interpolate(const Eigen::Quaterniond q0, const Eigen::Quaterniond q1, double u) {
+	double cos_omega = q0.dot(q1);
+	Eigen::Quaterniond toret;
+
+	if (cos_omega < 0) {
+		toret = -q0;
+		cos_omega = -cos_omega;
+	} else {
+		toret = q0;
+	}
+
+	if (cos_omega > 1) {
+		cos_omega = 1;
+	}
+
+	double omega = acos(cos_omega);
+	double sin_omega = sin(omega);
+	
+	if (fabs(sin_omega) < 1e-6) {
+		double mu = 1-u;
+		toret.w() = toret.w()*mu + q1.w()*u;
+		toret.x() = toret.x()*mu + q1.x()*u;
+		toret.y() = toret.y()*mu + q1.y()*u;
+		toret.z() = toret.z()*mu + q1.z()*u;
+		toret.normalize();
+	} else {
+		double a = sin((1-u) * omega)/ sin_omega;
+		double b = sin(u * omega) / sin_omega;
+		toret.w() = toret.w()*a + q1.w()*b;
+		toret.x() = toret.x()*a + q1.x()*b;
+		toret.y() = toret.y()*a + q1.y()*b;
+		toret.z() = toret.z()*a + q1.z()*b;
+	}
+	return toret;
+
 }
 
 
-void Transformation::trans_interpolate(Transformation *A, Transformation *B, double wb) {
+static void Transformation::trans_interpolate(Transformation *A, Transformation *B, double wb) {
 	m_trans = vector_interpolate_3d(A->m_trans, B->m_trans, wb);
 	m_quat = quat_interpolate(A->m_quat, B->m_quat, wb);
 }

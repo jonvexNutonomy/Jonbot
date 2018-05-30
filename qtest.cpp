@@ -58,5 +58,11 @@ int main() {
 	// cout << v0(1) << endl;
 	// cout << v0(2) << endl;
 
+	Eigen::Quaterniond q0(1.0, 2.0, 3.0, 4.0);
+	Eigen::Quaterniond q1(5.0, 6.0, 7.0, 8.0);
+	cout << q0.dot(q1) << endl;
+	q0.normalize();
+	cout << q0.dot(q1) << endl;
+
 
 }

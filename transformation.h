@@ -35,6 +35,25 @@ public:
 	void invert_this();
 
 	//bot_trans_invert_and_compose
+	void invert_and_compose(Transformation *curr, Transformation *prev);
+
+	//bot_vector_interpolate_3d
+	static Eigen::Vector3d vector_interpolate_3d(const Eigen::Vector3d A, const Eigen::Vector3d B, double bw);
+
+	//bot_quat_interpolate
+	static Eigen::Quaterniond quat_interpolate(const Eigen::Quaterniond q0, const Eigen::Quaterniond q1, double u);
+
+	//bot_trans_interpolate
+	static void trans_interpolate(Transformation *A, Transformation *B, double wb);
+
+	///
+	///bot_trans_rotate_vec is bot_quat_rotate_to
+	///and the other part is commented out
+	///
+
+
+	//bot_trans_apply_vec
+	Eigen::Vector3d apply_trans_to_vec(const Eigen::Vector3d vec);
 };
 
 #endif
