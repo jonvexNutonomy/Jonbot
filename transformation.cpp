@@ -98,6 +98,8 @@ static Eigen::Quaterniond Transformation::quat_interpolate(const Eigen::Quaterni
 		toret.x() = toret.x()*a + q1.x()*b;
 		toret.y() = toret.y()*a + q1.y()*b;
 		toret.z() = toret.z()*a + q1.z()*b;
+		//maybe normalize
+		//the original does not but i'll ask
 	}
 	return toret;
 
