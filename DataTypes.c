@@ -146,9 +146,51 @@ struct _BotTrans
     double trans_vec[3];
 };
 
+//----------------------------------------------
+// Update stuff
+
+struct update_t
+{
+    int64_t utime;              // utime that the actual measurement took place
+    
+    string frame;               // name of the frame to update
+    string relative_to;         // frame that the update is relative to
+    
+    double trans[3];            // translation vector component (x,y,z)
+    double quat[4];             // rotation quaternion component (w,x,y,z)
+
+                               
+}
+
+struct rigid_transform_t
+{
+    int64_t utime;              // utime that the actual measurement took place
+
+    double trans[3];            // translation vector component (x,y,z)
+
+    double quat[4];      		// rotation quaternion component (w,x,y,z)
+
+                               
+}
 
 
+struct pose_t
+{
+    int64_t utime;              // utime that the actual measurement took place
 
+    double pos[3];              // position x,y,z in meters in local frame
+    double vel[3];              // velocity in m/s, expressed in local frame,
+                                // _NOT_ body frame
 
+    double orientation[4];      // rotate vector in body coordinate frame 
+                                // (X-forward, Z-up) by this to get that vector
+                                // in local frame
 
+    double rotation_rate[3];    // angular velocity vector of the vehicle
+                                // in rad/s.  This is expressed in the local
+                                // frame.
+
+    double accel[3];            // Acceleration vector in the local frame in
+                                // m/s/s.  Does not include the gravity vector.
+}
 
